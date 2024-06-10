@@ -4,14 +4,15 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+const app = require('../app');
 const debug = require('debug');
+const http = require('http');
+const mongoose = require('mongoose');
+const { mongoURI: db } = require('../config/keys.js');
+
 const serverLogger = debug('backend:server');
 const dbLogger = debug('backend:mongodb');
-var http = require('http');
 
-
-dbLogger('Connected to MongoDB successfully');
 
 /**
  * Get port from environment and store in Express.
@@ -27,10 +28,19 @@ app.set('port', port);
 var server = http.createServer(app);
 
 /**
- * Listen on provided port, on all network interfaces.
+ * Connect to Mongo database, then allow the server to listen for requests
  */
+mongoose
+  .connect(db, { useNewUrlParser: true })
+  .then(() => {
+    dbLogger('Connected to MongoDB successfully');
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+    server.listen(port);
+  })
+  .catch(err => serverLogger(err))
 
-server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
