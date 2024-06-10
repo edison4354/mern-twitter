@@ -1,10 +1,15 @@
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+
 import { AuthRoute } from './components/Routes/Routes';
 import NavBar from './components/NavBar/NavBar';
 
 import MainPage from './components/MainPage/MainPage';
 import LoginForm from './components/SessionForms/LoginForm';
 import SignupForm from './components/SessionForms/SignupForm';
+
+import { getCurrentUser } from './store/session';
 
 const Layout = () => {
   return (
@@ -36,7 +41,13 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  const [loaded, setLoaded] = useState(false);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getCurrentUser()).finally(() => setLoaded(true));
+  }, [dispatch]);
+  
+  return loaded && <RouterProvider router={router} />;
 }
 
 export default App;

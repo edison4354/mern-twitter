@@ -29,11 +29,6 @@ export const clearSessionErrors = () => ({
 
 export const signup = user => startSession(user, 'api/users/register');
 export const login = user => startSession(user, 'api/users/login');
-export const logout = () => dispatch => {
-    localStorage.removeItem('jwtToken');
-    dispatch(logoutUser());
-};
-  
 
 const startSession = (userInfo, route) => async dispatch => {
   try {  
@@ -50,6 +45,17 @@ const startSession = (userInfo, route) => async dispatch => {
       return dispatch(receiveErrors(res.errors));
     }
   }
+};
+
+export const logout = () => dispatch => {
+  localStorage.removeItem('jwtToken');
+  dispatch(logoutUser());
+};
+
+export const getCurrentUser = () => async dispatch => {
+  const res = await jwtFetch('/api/users/current');
+  const user = await res.json();
+  return dispatch(receiveCurrentUser(user));
 };
 
 const nullErrors = null;
